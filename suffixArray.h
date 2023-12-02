@@ -43,18 +43,20 @@ private:
     template<typename T, typename C>
     static void printVector(const std::vector<T> &vector, char sep);
 
-    void bin_cosi(int  i, int j);
+    static void printStringVector(const std::vector<int> & string, char sep);
+
+//    void rightLCP(const int  &i, const int &j);
 
     void createLCPArray();
 
     int lcp(int i, int j);
 
-    int lcp(const std::string &pattern, int i, int m);
+    int lcp(const std::string &pattern, int i, int j, int m);
 
     std::pair<int, int> simpleSearch(const std::string &pattern);
 
     int LCPLookup(int d, int f);
 
-    std::pair<int, int> searchMP(const std::string &spattern);
+    std::pair<int, int> searchMP(const std::string &pattern);
 };
 #endif

@@ -29,16 +29,16 @@ SuffixArray::SuffixArray(const std::string& input_string) {
     printf("LCP:\t");
     printVector<int, int>(LCPArray, '\t');
 #endif
-    }
+}
 
 std::vector<int>SuffixArray:: search(const std::string& pattern) {
     // Search for the pattern in the suffix array
-    std::string spattern = std::string (pattern);
-    for(auto &s: spattern){ // Case-insensitive approach
+    std::string in_pattern = std::string (pattern);
+    for(auto &s: in_pattern){ // Case-insensitive approach
         s = char(toupper(s));
     }
     std::vector<int> r = std::vector<int>();
-    std::pair<int, int> r1 = searchMP(spattern);
+    std::pair<int, int> r1 = searchMP(in_pattern);
     if (r1.second == -1) r.push_back(r1.first);
     return r;
 }
@@ -52,7 +52,7 @@ void SuffixArray::createSuffixArray(const std::string & in_string){
     std::vector<std::vector<int>> suffixArrays;
     std::vector<std::vector<int>> strings;
 
-    size_t n = size_t(std::log2(std::log2(in_string.size()))) + 2;
+    size_t n = size_t(std::log2(in_string.size())) + 0;
     typeArrays = std::vector<std::vector<bool>>(n);
     LMSPointersArray = std::vector<std::vector<int>>(n);
     charCounts = std::vector<std::map<int, int>>(n);
@@ -139,14 +139,12 @@ std::vector<int> SuffixArray::reduce(const std::vector<int> &string, std::vector
         printf("%d\t", i);
     }
     printf("\nString:\t");
-    printVector<int, char>(string, '\t');
+    printStringVector(string, '\t');
     printf("Type_A:\t");
     printVector<bool, int>(typeArray, '\t');
-    printf("\nPointers:");
-    for(int i: LMSPointers){
-        printf("%d ", i);
-    }
-    printf("\nChar Counts: ");
+    printf("Pointers:");
+    printVector<int, int>(LMSPointers, ' ');
+    printf("Char Counts: ");
     for (const auto& pair : charCount) {
         if (pair.first == SENTINEL) printf("$");
         std::cout << static_cast<char>(pair.first) << ": " << pair.second << " ";
@@ -252,35 +250,54 @@ std::vector<T> SuffixArray::vectorSubRange(const std::vector<T>& originalVector,
 template<typename T, typename C>
 void SuffixArray::printVector(const std::vector<T> &inVector, char sep){
     for (T a:inVector) {
-        std::cout << (a == SENTINEL ? '$' : static_cast<C>(a)) << sep;
+        std::cout << a << sep;
     }
     std::cout << std::endl;
 }
-template<typename T, typename C>
-void SuffixArray::printVector(const std::vector<T> &vector){
-    for (T a:vector) {
-        std::cout << (a == SENTINEL ? '$' : static_cast<C>(a));
+void SuffixArray::printStringVector(const std::vector<int> &inVector, char sep){
+    for (int a:inVector) {
+        std::cout << (a == SENTINEL ? '$' : static_cast<char>(a)) << sep;
     }
     std::cout << std::endl;
 }
 
-void SuffixArray::bin_cosi(int  i, int j){ // odrekurzit?
-    printf("i:%d, j:%d\n", i, j);
-    if (i + 1 == j) return;
-    if (i < 0 || j < 0 || j >= 2*length || i >= 2*length) return;
-    int k = (i+j)/2;
-    LCPArray[length + 1 + k] = lcp(i, j);
-    bin_cosi(i, k);
-    bin_cosi(k, j);
+template<typename T, typename C>
+void SuffixArray::printVector(const std::vector<T> &vector){
+    for (T a:vector) {
+        std::cout << static_cast<C>(a);
+    }
+    std::cout << std::endl;
 }
+
+//void SuffixArray::rightLCP(const int  &i, const int &j){
+//    printf("i:%d, j:%d\n", i, j);
+//    if (i + 1 == j) return;
+//    if (i < 0 || j < 0 || j >= 2*length || i >= 2*length) return;
+//    int k = (i+j)/2, l = lcp(this->SA[i], this->SA[j]);
+//    LCPArray[length + 1 + k] = l;
+//    printf("Adding i:%d ->l:%d\n", k, l);
+//    rightLCP(i, k);
+//    rightLCP(k, j);
+//}
 void SuffixArray::createLCPArray(){
     int n = int(this->SA.size());
-    this->LCPArray = std::vector<int>(2 * n);
+    this->LCPArray = std::vector<int>(2 * n - 1);
     this->LCPArray[0] = 0;
     for (int i = 1; i < n; ++i) { // normal array
         this->LCPArray[i] = lcp(this->SA[i], this->SA[i - 1]);
     }
-    bin_cosi(0, length-1);
+    for (int i = this->length; i > 1;) { // right part of LCP
+        for (int j = -1, k = j+i; k <= this->length;) {
+            if (j == -1 || k == this->length){
+                LCPArray[this->length + 1 + (k+j)/2] = 0;
+            } else{
+                LCPArray[this->length + 1 + (k+j)/2] = lcp(this->SA[j], this->SA[k]);
+            }
+            j += i;
+            k += i;
+        }
+        i /= 2;
+    }
 #ifdef DEBUG
     printf("LCP: ");
     printVector<int, int>(LCPArray, ' ');
@@ -288,29 +305,33 @@ void SuffixArray::createLCPArray(){
 }
 
 int SuffixArray::lcp(int i, int j){
-   int n = int(std::min(this->string.size()-i, this->string.size()-j));
+    int n = int(std::min(this->string.size()-i, this->string.size()-j));
     for (int k = 0; k < n; ++k) {
+//        printf("%c vs %c\n", this->string[i], this->string[j]);
         if (this->string[i++] != this->string[j++]) return k;
     }
     return n;
 }
-int SuffixArray::lcp(const std::string &pattern, int i, int m){
-    //printf("%s vs %s", pattern.c_str(), this->string.substr(i, this->length-i).c_str());
-    int j = std::min(m, this->length - i);
-    for (int k = 0; k < j; ++k) {
-        if (this->string[i++] != pattern[k]) return k;
+int SuffixArray::lcp(const std::string &pattern, int i, int j, int m){
+    int k = 0;
+    while (j < m && i < this->length) {
+        if (this->string[i++] != pattern[j++]) return k;
+        k++;
     }
-    return j;
+    return k;
 }
 
 std::pair<int, int> SuffixArray::simpleSearch(const std::string &pattern){
     int m = int(pattern.size()), n = this->length;
     int d = 0, f = n, i, l;
-    std::vector<int> results = std::vector<int>();
+//    std::vector<int> results = std::vector<int>();
 
     while (d+1 < f){
+#ifdef DEBUG
+        printf("d: %d, f: %d, i: %d, l: %d\n", d, f, i, l);
+#endif
         i = (d + f) / 2;
-        l = lcp(pattern, this->SA[i], m);
+        l = lcp(pattern, this->SA[i], 0, m);
         if (l == m and l == (n - this->SA[i])) {
             return {this->SA[i], -1};
         } else if ( l == (n - this->SA[i] - 1) ||
@@ -319,36 +340,40 @@ std::pair<int, int> SuffixArray::simpleSearch(const std::string &pattern){
         } else{
             f = i;
         }
-#ifdef DEBUG
-        printf("d: %d, f: %d, i: %d, l: %d\n", d, f, i, l);
-#endif
     }
     return {d, f};
 }
+
 int SuffixArray::LCPLookup(int d, int f){
+    if (d == -1 || f == this->length) return 0;
     if (d+1 == f) return this->LCPArray[f];
     return LCPArray[this->length + 1 + (d+f)/2];
 }
-std::pair<int, int> SuffixArray::searchMP(const std::string &spattern){
-    int d=0, f= this->length, ld=0, lf=0, i, l, m = int(spattern.size());
+
+std::pair<int, int> SuffixArray::searchMP(const std::string &pattern){
+    int d=-1, f= this->length, lf=0, ld=0, i=0, l=0, m = int(pattern.size()), LCPdi, LCPif;
     while (d+1 < f){
         i = (d + f) / 2;
-        if (ld <= LCPLookup(SA[i], SA[f]) && LCPLookup(SA[i], SA[f]) < lf){ // case A
+        LCPdi =  LCPLookup(d, i), LCPif = LCPLookup(i, f);
+#ifdef DEBUG
+        printf("d: %d, f:%d, i:%d, ld:%d, lf:%d, l:%d, lcpdi:%d, lcpfi:%d\n", d, f, i, ld, lf, l, LCPdi, LCPif);
+#endif
+        if (ld <= LCPif && LCPif < lf){ // case A
             d = i;
-            ld = lcp(i, f);
-        } else if (ld <= lf && lf < LCPLookup(SA[i], SA[f])){ // case B
+            ld = LCPif;
+        } else if (ld <= lf && lf < LCPif){ // case B
             f = i;
-        } else if (lf <= LCPLookup(SA[d], SA[i]) && LCPLookup(SA[d], SA[i]) < ld){ // case A for ld > lf
+        } else if (lf <= LCPdi && LCPdi < ld){ // case A for ld > lf
             f = i;
-            lf = lcp(d, i);
-        } else if ( lf <= ld && ld < LCPLookup(SA[d], SA[i])){ // case B for ld > lf
+            lf = LCPdi;
+        } else if ( lf <= ld && ld < LCPdi){ // case B for ld > lf
             d = i;
-        } else{
+        } else{ // Case C
             l = std::max(ld, lf);
-            l = l + 1; // něco
-            if (l == m && l == (this->SA[i])) {return {i, -1};
+            l += lcp(pattern, SA[i] + l, l, m);
+            if (l == m && l == (this->length - this->SA[i])) {return {SA[i], -1};
             } else if ((l == (this->length - this->SA[i])) ||
-                       (l != m && this->string[this->SA[i] + l] < spattern[l])){
+                       (l != m && this->string[this->SA[i] + l] < pattern[l])){
                 d = i;
                 ld = l;
             } else {
@@ -376,7 +401,8 @@ int main(){
     std::string pattern;
 //    std::cout << "Enter the pattern to search for: ";
 //    std::cin >> pattern;
-    pattern = "ssii";
+
+    pattern = "mmiissiissiippii";
 
     std::vector<int> result = suffixArray.search(pattern);
 
@@ -387,7 +413,7 @@ int main(){
         }
         std::cout << std::endl;
     } else {
-        std::cout << "Pattern was not found in the text." << std::endl;
+        std::cout << "Pattern " << pattern << " was not found in the text." << std::endl;
     }
 
     return 0;
