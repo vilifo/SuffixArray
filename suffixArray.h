@@ -14,6 +14,8 @@ class SuffixArray {
 public:
     explicit SuffixArray(const std::string &input_string);
 
+    std::vector<int> searchSimple(const std::string &pattern);
+
     std::vector<int> search(const std::string &pattern);
 
 private:
@@ -45,7 +47,7 @@ private:
 
     static void printStringVector(const std::vector<int> & string, char sep);
 
-//    void rightLCP(const int  &i, const int &j);
+    void rightLCP();
 
     void createLCPArray();
 
@@ -53,10 +55,16 @@ private:
 
     int lcp(const std::string &pattern, int i, int j, int m);
 
+    int lcp(const std::string &pattern, int i, int m);
+
     std::pair<int, int> simpleSearch(const std::string &pattern);
+
+    std::pair<int, int> simpleSearchInterval(int i, int d, int f, int m);
 
     int LCPLookup(int d, int f);
 
     std::pair<int, int> searchMP(const std::string &pattern);
+
+    std::pair<int, int> searchMPInterval(int i, int d, int f, int m);
 };
 #endif

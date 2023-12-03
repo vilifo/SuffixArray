@@ -5,12 +5,12 @@
 
 class NaiveSearch {
 public:
-    explicit NaiveSearch(const std::string& input_string);
+    explicit NaiveSearch(const std::string& string);
 	
 	std::vector<int> search(const std::string & pattern);
 
 private:
-    std::string input_string;
+    std::string string;
     int length;
 
     static std::string preproccess(const std::string & string);
