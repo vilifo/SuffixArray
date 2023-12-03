@@ -9,7 +9,7 @@ void printVector(const std::vector<T> &inVector, char sep){
     }
     std::cout << std::endl;
 }
-void printStringVector(const std::vector<long int> &inVector, char sep){
+void printStringVector(const std::vector<int> &inVector, char sep){
     for (int a:inVector) {
         std::cout << (a == SENTINEL ? '$' : static_cast<char>(a)) << sep;
     }

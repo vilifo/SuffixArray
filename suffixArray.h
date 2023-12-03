@@ -39,14 +39,6 @@ private:
     template<typename T>
     static std::vector<T> vectorSubRange(const std::vector<T>& originalVector, size_t start, size_t l);
 
-    template<typename T, typename C>
-    static void printVector(const std::vector<T> &vector);
-
-    template<typename T, typename C>
-    static void printVector(const std::vector<T> &vector, char sep);
-
-    static void printStringVector(const std::vector<int> & string, char sep);
-
     void rightLCP();
 
     void createLCPArray();
