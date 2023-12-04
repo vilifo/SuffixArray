@@ -6,9 +6,6 @@
 #include <unordered_map>
 #include <stack>
 #include "suffixArray.h"
-#ifdef DEBUG
-#include "printFunctions.h"
-#endif
 
 SuffixArray::SuffixArray(const std::string& input_string) {
     string = std::string(input_string);

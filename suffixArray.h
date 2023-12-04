@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <map>
 #include <unordered_map>
+#ifdef DEBUG
+#include "printFunctions.h"
+#endif
 
 #ifndef SUFFIX_ARRAY_H
 #define SUFFIX_ARRAY_H

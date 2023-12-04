@@ -1,5 +1,8 @@
 #include "NaiveAlgorithm.h"
 #include "suffixArray.h"
+#ifdef DEBUG
+//#include "printFunctions.h"
+#endif
 #include <iostream>
 #include <fstream>
 #include <sstream>
