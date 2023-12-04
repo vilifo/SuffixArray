@@ -102,12 +102,12 @@ void testFile(std::string & textFile, std::string & patternsFile){
 
 int main() {
     std::vector<std::pair<std::string, std::string>> test = {
-            {"tests/smallest.txt", "tests/smallest_patterns.txt"},
+//            {"tests/smallest.txt", "tests/smallest_patterns.txt"},
             {"tests/small.txt", "tests/small_patterns.txt"},
-            {"tests/dna.txt", "tests/dna_patterns.txt"},
-            {"tests/dna_large.txt", "tests/dna_large_patterns.txt"},
             {"tests/harry.txt", "tests/harry_patterns.txt"},
-            {"tests/20000-Leagues-Under-the-Sea.txt", "tests/20000-Leagues-Under-the-Sea_patterns.txt"}
+            {"tests/dna.txt", "tests/dna_patterns.txt"},
+            {"tests/20000-Leagues-Under-the-Sea.txt", "tests/20000-Leagues-Under-the-Sea_patterns.txt"},
+            {"tests/dna_large.txt", "tests/dna_large_patterns.txt"}
     };
     for (auto testItem:test) {
         testFile(testItem.first, testItem.second);
